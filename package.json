@@ -1,0 +1,25 @@
+{
+  "name": "srequire",
+  "version": "1.0.0",
+  "description": "A simple way to require modules from cwd",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/StarBlizard/srequire.git"
+  },
+  "keywords": [
+    "require",
+    "node",
+    "cwd",
+    "path"
+  ],
+  "author": "StarBlizzard",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/StarBlizard/srequire/issues"
+  },
+  "homepage": "https://github.com/StarBlizard/srequire#readme"
+}
