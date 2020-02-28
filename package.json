@@ -21,5 +21,8 @@
   "bugs": {
     "url": "https://github.com/StarBlizard/srequire/issues"
   },
-  "homepage": "https://github.com/StarBlizard/srequire#readme"
+  "homepage": "https://github.com/StarBlizard/srequire#readme",
+  "dependencies": {
+    "path": "^0.12.7"
+  }
 }
