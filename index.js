@@ -5,10 +5,6 @@ const _        = require('underscore');
 /*
  * dir can be:
  * 'path/to/something'
- *
- * or...
- *
- * 'underscore'
  * */
 
 let savedRoutes = {};
@@ -17,12 +13,10 @@ module.exports = dir => {
   if (!dir)                     { throw new Error('Please specify a route');  }
   if ((typeof dir) != 'string') { throw new Error('srequire needs a string'); }
 
-  if (dir.indexOf('/') == -1) { return require(dir); }
-
   const routeName  = dir.split('/')[0];
   const savedRoute = savedRoutes[routeName]
 
-  if (!savedRoute) { return join(route, dir); }
+  if (!savedRoute) { return join(cwd, dir); }
 
   const route = savedRoute ? join(cwd, dir.replace(routeName, savedRoute)) : cwd;
 

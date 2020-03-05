@@ -1,6 +1,6 @@
 {
   "name": "srequire",
-  "version": "2.0.1",
+  "version": "2.0.2",
   "description": "A simple way to require modules from cwd",
   "main": "index.js",
   "scripts": {
