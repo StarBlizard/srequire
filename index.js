@@ -16,7 +16,7 @@ module.exports = dir => {
   const routeName  = dir.split('/')[0];
   const savedRoute = savedRoutes[routeName]
 
-  if (!savedRoute) { return join(cwd, dir); }
+  if (!savedRoute) { return require(join(cwd, dir)); }
 
   const route = savedRoute ? join(cwd, dir.replace(routeName, savedRoute)) : cwd;
 
