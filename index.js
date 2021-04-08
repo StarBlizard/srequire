@@ -1,26 +1,36 @@
-const cwd      = process.cwd();
+const fs       = require('fs');
 const { join } = require('path');
 const _        = require('underscore');
+
+const cwd = process.cwd();
 
 /*
  * dir can be:
  * 'path/to/something'
  * */
 
-let savedRoutes = {};
+const srequire = function(dir) {
+  return require(this.joinToCWD(route));
+};
 
-module.exports = dir => {
+srequire.savedRoutes = {};
+
+srequire.joinToCWD = function(dir) {
+  return join.apply(this, [ cwd, ...arguments ]);
+};
+
+srequire.join = function() {
+  const [ dir, ...routes ] = arguments;
+
   if (!dir)                     { throw new Error('Please specify a route');  }
-  if ((typeof dir) != 'string') { throw new Error('srequire needs a string'); }
+  if ((typeof dir) != 'string') { throw new Error('srequire, join and jointToCWD needs a string'); }
 
   const routeName  = dir.split('/')[0];
-  const savedRoute = savedRoutes[routeName]
+  const savedRoute = this.savedRoutes[routeName]
 
-  if (!savedRoute) { return require(join(cwd, dir)); }
+  if (savedRoute) { return join.apply(this, [ savedRoute, ...arguments ]); }
 
-  const route = savedRoute ? join(cwd, dir.replace(routeName, savedRoute)) : cwd;
-
-  return require(route);
+  return join.apply(this, arguments);
 };
 
 /*
@@ -37,14 +47,25 @@ module.exports = dir => {
  *  srequire('anythingl/athing')
  * */
 
-module.exports.setBaseRoutes = routes => {
-  savedRoutes = _.extend(savedRoutes, routes);
-  return savedRoutes;
+// Now you can just save a file on the cwd, json or js that exports the baseRoutes
+if (fs.existsSync(join(cwd, './baseRoutes.json'))) {
+  srequire.setBaseRoutes(JSON.parse(fs.readFileSync('./baseRoutes.json')));
+}
+
+if (fs.existsSync(join(cwd, './baseRoutes.js'))) {
+  srequire.setBaseRoutes(this.savedRoutes, srequire('./baseRoutes.js'));
+}
+
+srequire.setBaseRoutes = function(routes) {
+  this.savedRoutes = _.extend(this.savedRoutes, routes);
+  return this.savedRoutes;
 };
 
-module.exports.setBaseRoute = (name, route) => {
-  savedRoutes[name] = route;
-  return savedRoutes;
+srequire.setBaseRoute = function(name, route) {
+  this.savedRoutes[name] = route;
+  return this.savedRoutes;
 };
 
-module.exports.routes = (name, route) => savedRoutes;
+srequire.routes = function() { return this.savedRoutes; };
+
+module.exports = srequire;
