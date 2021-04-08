@@ -10,25 +10,35 @@ const cwd = process.cwd();
  * */
 
 const srequire = function(dir) {
-  return require(this.joinToCWD(route));
+  return require(module.exports.joinToCWD(dir));
 };
 
 srequire.savedRoutes = {};
 
 srequire.joinToCWD = function(dir) {
-  return join.apply(this, [ cwd, ...arguments ]);
+  return this.join.apply(this, [ cwd, ...arguments ]);
 };
 
 srequire.join = function() {
-  const [ dir, ...routes ] = arguments;
+  let [ base, dir, ...routes ] = arguments;
 
-  if (!dir)                     { throw new Error('Please specify a route');  }
-  if ((typeof dir) != 'string') { throw new Error('srequire, join and jointToCWD needs a string'); }
+  if (!base)                     { throw new Error('Please specify a route');  }
+  if ((typeof base) != 'string') { throw new Error('srequire, join and jointToCWD needs a string'); }
 
-  const routeName  = dir.split('/')[0];
+  const baseRoute = base === cwd ? dir : base;
+
+  const routeName  = baseRoute.indexOf('/') > -1 ?
+    baseRoute.split('/')[0] : baseRoute.split('\\')[0];
   const savedRoute = this.savedRoutes[routeName]
 
-  if (savedRoute) { return join.apply(this, [ savedRoute, ...arguments ]); }
+  if (savedRoute) {
+    return join.apply(
+      this,
+      base === cwd ?
+        [ base, dir.replace(routeName, savedRoute), ...routes ] :
+        [ base.replace(routeName, savedRoute), dir, ...routes ]
+      );
+  }
 
   return join.apply(this, arguments);
 };
@@ -47,14 +57,7 @@ srequire.join = function() {
  *  srequire('anythingl/athing')
  * */
 
-// Now you can just save a file on the cwd, json or js that exports the baseRoutes
-if (fs.existsSync(join(cwd, './baseRoutes.json'))) {
-  srequire.setBaseRoutes(JSON.parse(fs.readFileSync('./baseRoutes.json')));
-}
-
-if (fs.existsSync(join(cwd, './baseRoutes.js'))) {
-  srequire.setBaseRoutes(this.savedRoutes, srequire('./baseRoutes.js'));
-}
+srequire.routes = function() { return this.savedRoutes; };
 
 srequire.setBaseRoutes = function(routes) {
   this.savedRoutes = _.extend(this.savedRoutes, routes);
@@ -66,6 +69,13 @@ srequire.setBaseRoute = function(name, route) {
   return this.savedRoutes;
 };
 
-srequire.routes = function() { return this.savedRoutes; };
+// Now you can just save a file on the cwd, json or js that exports the baseRoutes
+if (fs.existsSync(srequire.joinToCWD('baseRoutes.json'))) {
+  srequire.setBaseRoutes(JSON.parse(fs.readFileSync('baseRoutes.json')));
+}
+
+if (fs.existsSync(srequire.joinToCWD('baseRoutes.js'))) {
+  srequire.setBaseRoutes(this.savedRoutes, srequire('baseRoutes'));
+}
 
 module.exports = srequire;
